@@ -1,0 +1,7 @@
+{
+  "vertex": "optix:core/rounded_pill",
+  "fragment": "optix:core/rounded_pill",
+  "samplers": [
+    "DiffuseSampler"
+  ]
+}

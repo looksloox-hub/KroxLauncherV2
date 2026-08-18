@@ -1,11 +1,11 @@
 {
 	"schemaVersion": 1,
-	"id": "optixclient",
+	"id": "kroxclient",
 	"version": "1.7.0",
-	"name": "Optix Client",
+	"name": "Krox Client",
 	"icon": "assets/optimisticclient/icon.png",
 
-	"description": "OptiX Client is a modern Fabric-based Minecraft client featuring a sleek ClickGUI, draggable HUD system, customizable modules, and performance-focused enhancements designed for smooth PvP gameplay and clean UI control.",
+	"description": "Krox Client is a modern Fabric-based Minecraft client featuring a sleek ClickGUI, draggable HUD system, customizable modules, and performance-focused enhancements designed for smooth PvP gameplay and clean UI control.",
 
 	"authors": [
 		"Regent Playz"

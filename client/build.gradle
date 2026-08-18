@@ -1,0 +1,16 @@
+plugins {
+    id 'net.fabricmc.fabric-modding' version '0.53.+'
+}
+
+group = 'com.example'
+version = '1.0.0'
+
+minecraft = {
+    version = '1.21.1'
+    exports = ['client', 'server']
+    channels = ['stable']
+}
+
+dependencies {
+    fabricApi 'net.fabricmc:fabric-api:0.+'
+}

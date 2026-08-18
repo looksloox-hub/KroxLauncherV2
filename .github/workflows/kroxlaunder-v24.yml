@@ -1,0 +1,75 @@
+name: KroxLauncher V24 Build & Push
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-22.04
+    env:
+      ANDROID_SDK_URL: "https://dl.google.com/android/repository/commandline-tools-latest-linux.zip"
+      ANDROID_BUILD_TOOLS: "35.0.0"
+      # GitHub App token for KroxLauncherV2 push (set as secret: GITHUB_TOKEN)
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    steps:
+      - name: Checkout KroxLauncherV2 repo
+        uses: actions/checkout@v4
+        with:
+          repository: looksloox-hub/KroxLauncherV2
+          persist-credentials: false
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: gradle
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "8.14.3"
+
+      - name: Assemble Android Debug APK
+        run: |
+          echo "sdk.dir=$ANDROID_HOME" > local.properties
+          ./gradlew :app_pojavlauncher:assembleFullDebug
+
+      - name: Build Fabric Mod .jar
+        run: |
+          cd client
+          ./gradlew build
+
+      - name: Git Add All Changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .
+
+      - name: Git Commit V24 Overhaul
+        run: |
+          git commit -m "feat: complete scratch overhaul V24 - fixed launch routing, fixed cape rendering, deep onyx-crimson UI redesign" || echo "No changes to commit"
+
+      - name: Git Push to KroxLauncherV2
+        run: |
+          git push origin main
+        env:
+          GIT_AUTHOR_NAME: "github-actions[bot]"
+          GIT_AUTHOR_EMAIL: "41898282+github-actions[bot]@users.noreply.github.com"
+          GIT_COMMITTER_NAME: "github-actions[bot]"
+          GIT_COMMITTER_EMAIL: "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Upload Debug APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: kroxlaunder-debug-apk
+          path: app_pojavlauncher/build/outputs/apk/full/debug/app_pojavlauncher-full-debug.apk
+
+      - name: Upload Mod .jar Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: kroxlaunder-mod-jar
+          path: client/build/libs/*.jar

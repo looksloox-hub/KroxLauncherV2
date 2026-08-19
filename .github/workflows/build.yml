@@ -1,0 +1,40 @@
+name: Android Build Pipeline
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Accept Android SDK Licenses
+        run: |
+          mkdir -p $ANDROID_HOME/licenses
+          echo -e "\n89330d322b15d61289731b655079bfa8656c66e9\nd56f5187479451eabf01fb78af6d7d3579d85e27" > $ANDROID_HOME/licenses/android-sdk-license
+          echo -e "\nf1282d02c5f102710103791d2b9921861209301e" > $ANDROID_HOME/licenses/android-ndk-license
+
+      - name: Make gradlew Executable
+        run: chmod +x gradlew
+
+      - name: Build Debug APK
+        run: ./gradlew assembleDebug --stacktrace
+
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: DemoLauncher-Debug-APK
+          path: "**/build/outputs/apk/**/*.apk"

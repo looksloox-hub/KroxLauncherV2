@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KroxLauncher V24 - Cyber-Onyx UI Overhaul</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --obsidian: #08080A;
+            --charcoal: #121216;
+            --steel-grey: #24242C;
+            --crimson: #DC2626;
+            --crimson-glow: rgba(220, 38, 38, 0.4);
+            --white: #FFFFFF;
+            --text-primary: #F0F0F2;
+            --text-secondary: #888888;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Roboto', sans-serif;
+            background: var(--obsidian);
+            color: var(--text-primary);
+            overflow-x: hidden;
+        }
+
+        /* === TOP BAR === */
+        .top-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 64px;
+            background: rgba(8, 8, 10, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--crimson);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 16px;
+            z-index: 100;
+        }
+
+        .account-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .avatar-circle {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--crimson);
+            position: relative;
+            border: 2px solid var(--obsidian);
+        }
+
+        .avatar-circle::after {
+            content: '';
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background: var(--crimson-glow);
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .username {
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .settings-gear {
+            width: 40px;
+            height: 40px;
+            background: var(--steel-grey);
+            border: 1px solid var(--crimson);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--crimson);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .settings-gear::after {
+            content: '⚙';
+            font-size: 18px;
+        }
+
+        .settings-gear.pulsing::after {
+            animation: pulse 2s ease infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.7; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        /* === SIDEBAR === */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 64px;
+            bottom: 0;
+            width: 60px;
+            background: var(--charcoal);
+            border-right: 1px solid var(--crimson);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 8px;
+            z-index: 50;
+        }
+
+        .sidebar-icon {
+            width: 32px;
+            height: 32px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            margin: 8px 0;
+            position: relative;
+        }
+
+        .sidebar-icon.active {
+            outline: 2px solid var(--crimson);
+            border-radius: 4px;
+        }
+
+        .sidebar-icon svg {
+            width: 20px;
+            height: 20px;
+            fill: var(--text-secondary);
+            stroke: var(--text-secondary);
+        }
+
+        .sidebar-icon.active svg {
+            fill: var(--crimson);
+        }
+
+        /* === HOME DASHBOARD === */
+        .home-deck {
+            position: fixed;
+            left: 80px;
+            top: 64px;
+            right: 60px;
+            bottom: 0;
+            background: var(--charcoal);
+            margin: 8px;
+            border-radius: 16px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            z-index: 50;
+        }
+
+        .version-selector {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--crimson);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .launch-button {
+            margin: 16px auto;
+            width: 56px;
+            height: 56px;
+            background: var(--steel-grey);
+            border: 2px solid var(--crimson);
+            border-radius: 8px;
+            color: var(--white);
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .launch-button:hover {
+            background: var(--crimson);
+            color: var(--obsidian);
+        }
+
+        /* === IN-GAME UI MOCKUP === */
+        .game-container {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            background: var(--obsidian);
+            overflow: hidden;
+        }
+
+        .hud-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+        }
+
+        .hud-element {
+            pointer-events: auto;
+            font-size: 12px;
+            color: var(--crimson);
+        }
+
+        .fps-counter {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+        }
+
+        .coordinates {
+            position: absolute;
+            bottom: 8px;
+            left: 8px;
+        }
+
+        /* === MOD MANAGER MOCKUP === */
+        .mod-manager {
+            padding: 16px;
+        }
+
+        .mod-card {
+            background: var(--steel-grey);
+            border: 1px solid var(--crimson);
+            border-radius: 8px;
+            padding: 12px;
+            margin: 8px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .mod-toggle {
+            width: 40px;
+            height: 20px;
+            background: var(--crimson);
+            border-radius: 10px;
+            position: relative;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .mod-toggle::after {
+            content: '';
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            background: var(--obsidian);
+            border-radius: 50%;
+            top: 50%;
+            left: 2px;
+            transform: translateY(-50%);
+            transition: left 0.2s;
+        }
+
+        .mod-toggle.active::after {
+            left: 22px;
+        }
+
+        /* ===================================== */
+        /* GENERIC ELEMENTS */
+        /* ===================================== */
+
+        button:focus {
+            outline: 2px solid var(--crimson);
+            outline-offset: 2px;
+        }
+
+        a {
+            color: var(--crimson);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ===== TOP BAR ===== -->
+    <div class="top-bar">
+        <div class="account-badge">
+            <div class="avatar-circle"></div>
+            <span class="username">PlayerName</span>
+        </div>
+        <button class="settings-gear pulsing" aria-label="Settings"></button>
+    </div>
+
+    <!-- ===== SIDEBAR ===== -->
+    <div class="sidebar">
+        <button class="sidebar-icon active" aria-label="Home">
+            <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+        </button>
+        <button class="sidebar-icon" aria-label="Mod Manager">
+            <svg viewBox="0 0 24 24"><path d="M3 3v18h2v-6H5v5H3v18zm11-6h2v5h2v-5h2v5h2v-5h2v5h2v-5h2v5h2v-5h2v5h2v-5h2v5h2v-5h2v5h2v-5h2v5h2v-5h2v5h2v-5h2v5h2v-5h2v5h2v-5h2v5h2v-5h2v5h2v-5h2v5h2v-5h2v5h2v-5h2"/></svg>
+        </button>
+        <button class="sidebar-icon" aria-label="File Manager">
+            <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h5V3z"/></svg>
+        </button>
+        <button class="sidebar-icon" aria-label="FPS Booster">
+            <svg viewBox="0 0 24 24"><path d="M18 13h-1V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v5H3v2h15zm-5 8c-1.1 0-2-.9-2-2h-3c0 1.1-.89 2-2 2s-2-.9-2-2h-3c0 1.1-.89 2-2 2s-2-.9-2-2h-3c0 1.1-.89 2-2 2s-2-.9-2-2h-3c0 1.1-.89 2-2 2s-2-.9-2-2H5c0 1.1.89 2 2 2h6v2h-6zm0-4c-1.1 0-2-.9-2-2h-3c0 1.1-.89 2-2 2s-2-.9-2-2h-3c0 1.1-.89 2-2 2s-2-.9-2-2h-3c0 1.1-.89 2-2 2s-2-.9-2-2H3v2h18V7z"/></svg>
+        </button>
+        <button class="sidebar-icon" aria-label="Accounts">
+            <svg viewBox="0 0 24 24"><path d="M3 3v18h2L3 5v13h2L3 3zm18 0v18h-2L21 5v13h-2L21 3zm-9 0c-1.1 0-2-.9-2-2h-3c0-1.1.9-2 2-2h3c1.1 0 2 .9 2 2h3c-1.1 0-2-.9-2-2H6z"/></svg>
+        </button>
+    </div>
+
+    <!-- ===== HOME DECK ===== -->
+    <div class="home-deck">
+        <div class="version-selector">
+            <span>1.21.1</span>
+            <select style="background: var(--crimson); color: var(--obsidian); padding: 4px 8px; border-radius: 4px; border: none;">
+                <option>1.21.1</option>
+                <option>1.21.4</option>
+                <option>1.21.5</option>
+            </select>
+        </div>
+        <button class="launch-button">LAUNCH</button>
+    </div>
+
+    <!-- ===== IN-GAME HUD MOCKUP ===== -->
+    <div class="game-container">
+        <div class="hud-overlay">
+            <div class="hud-element fps-counter">FPS: 120</div>
+            <div class="hud-element coordinates">X: 128 Y: 64 Z: 200</div>
+        </div>
+    </div>
+
+    <!-- ===== MOD MANAGER MOCKUP ===== -->
+    <div class="mod-manager">
+        <div class="mod-card">
+            <span>OptiFine HD</span>
+            <div class="mod-toggle active"></div>
+        </div>
+        <div class="mod-card">
+            <span>Lithium</span>
+            <div class="mod-toggle"></div>
+        </div>
+        <div class="mod-card">
+            <span>Sodium</span>
+            <div class="mod-toggle active"></div>
+        </div>
+    </div>
+
+</body>
+</html>

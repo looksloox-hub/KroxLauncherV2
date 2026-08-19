@@ -15,8 +15,8 @@ dependencyResolutionManagement {
 }
 
 rootProject.name='HyperLauncher'
-include ':hyperX_launcher'
-project(':hyperX_launcher').projectDir = new File('app_pojavlauncher')
+include ':app_pojavlauncher'
+project(':app_pojavlauncher').projectDir = new File('app_pojavlauncher')
 
 include ':forge_installer'
 include ':dnbglfw'

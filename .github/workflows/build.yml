@@ -27,11 +27,25 @@ jobs:
           echo -e "\n89330d322b15d61289731b655079bfa8656c66e9\nd56f5187479451eabf01fb78af6d7d3579d85e27" > $ANDROID_HOME/licenses/android-sdk-license
           echo -e "\nf1282d02c5f102710103791d2b9921861209301e" > $ANDROID_HOME/licenses/android-ndk-license
 
-      - name: Make gradlew Executable
-        run: chmod +x gradlew
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew || true
 
       - name: Build Debug APK
-        run: ./gradlew assembleDebug --stacktrace
+        run: |
+          if [ -f "gradlew" ]; then
+            ./gradlew assembleDebug --stacktrace
+          else
+            # Search if gradlew exists in subfolder
+            GRADLE_PATH=$(find . -name "gradlew" -maxdepth 2 | head -n 1)
+            if [ -n "$GRADLE_PATH" ]; then
+              cd $(dirname "$GRADLE_PATH")
+              chmod +x gradlew
+              ./gradlew assembleDebug --stacktrace
+            else
+              echo "Error: No gradlew wrapper or build.gradle found in repository!"
+              exit 1
+            fi
+          fi
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4

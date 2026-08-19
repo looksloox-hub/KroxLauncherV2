@@ -34,8 +34,15 @@ jobs:
           gradle-version: "8.14.3"
 
       - name: Assemble Android Debug APK
+        env:
+          ANDROID_SDK_ROOT: "/workspaces/Android/Sdk"
         run: |
           echo "sdk.dir=$ANDROID_HOME" > local.properties
+          # Accept Android SDK licenses - required before first build
+          # If sdkmanager is available, run: cd /workspaces/Android/Sdk && bin/sdkmanager --licenses
+          # If sdkmanager is NOT available, accept licenses manually:
+          #   echo "d56f5187479451d1fb0d15b4e3e664cb4e866ef0" > /workspaces/Android/Sdk/licenses/android-ndk-license
+          #   echo "84831b9409646a4c7d5685e4c9e6790f" > /workspaces/Android/Sdk/licenses/android-sdk-license
           ./gradlew :app_pojavlauncher:assembleFullDebug
 
       - name: Build Fabric Mod .jar

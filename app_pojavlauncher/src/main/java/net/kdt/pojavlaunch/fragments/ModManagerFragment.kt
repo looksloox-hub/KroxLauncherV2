@@ -48,8 +48,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.preferSize
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.SurfaceFactory
-import androidx.compose.ui.layout.Mayor
 import kotlin.result.success
 import net.kdt.pojavlaunch.BaseActivity
 import net.kdt.pojavlaunch.authenticator.Accounts
@@ -78,7 +76,7 @@ fun ModManagerFragment(
     var inputName by remember { mutableStateOf("") }
     var toggleStates by remember { mutableStateOf<Map<String, Boolean>>(emptyMap()) }
 
-    val viewModel: DirectoryManagerViewModel = viewModel()
+    val viewModel: DirectoryManagerViewModel = hiltViewModel()
     viewModel.init("Mods", "/mods")
 
     // Refresh toggle states when entries change
@@ -87,7 +85,7 @@ fun ModManagerFragment(
     LaunchedEffect(entries) {
         // Initialize toggle states for .jar files
         val jarEntries = entries.filter { it.name.endsWith(".jar") }
-        if (toggleStates.isEmpty()) {
+        if (toggleStates.isEmpty() && !jarEntries.isEmpty()) {
             toggleStates = remember { mutableMapOf(jarEntries.indices.map { it to false }.toMap()) }
         }
     }
@@ -178,7 +176,7 @@ fun ModManagerFragment(
                         onClick = {
                             viewModel.deleteSelected()
                             showDeleteConfirm = false
-                            toggleStates = toggleStates - viewModel.selectedFile?.path ?: toggleStates.keySet().toMutableMap()::toMutableMap()
+                            toggleStates = toggleStates - (viewModel.selectedFile?.path ?: "")
                         },
                         colors = ButtonDefaults.buttonColors(
                             containerColor = MaterialTheme.colorScheme.error,
@@ -287,7 +285,7 @@ fun ModCard(
     /**
      * Toggle mod enabled/disable without deleting the file
      */
-    private fun toggleMod(file: File, enabled: Boolean) {
+    fun toggleMod(file: File, enabled: Boolean) {
         // Rename file to .enabled/.disabled or remove extension toggle
         if (enabled) {
             // Mark as enabled - could add .enabled extension or just track state

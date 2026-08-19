@@ -39,6 +39,7 @@ import androidx.compose.foundation.indicator.rememberToggleSource
 import androidx.compose.foundation.indicator.Toggleable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.height
@@ -46,8 +47,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.preferSize
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.SurfaceFactory
-import androidx.compose.ui.layout.Mayor
 import kotlin.result.success
 import net.kdt.pojavlaunch.BaseActivity
 import net.kdt.pojavlaunch.authenticator.Accounts
@@ -55,6 +54,7 @@ import net.kdt.pojavlaunch.kotlin.ui.viewmodel.DirectoryManagerViewModel
 import net.kdt.pojavlaunch.ui.screens.SettingsOverlay
 import net.kdt.pojavlaunch.ui.screens.AboutOverlay
 import net.kdt.pojavlaunch.ui.screens.ModManagerFragment
+import dagger.hilt.android.lifecycle.hiltViewModel
 
 /**
  * File Manager Fragment - displays directory structure with toolbar actions
@@ -76,7 +76,7 @@ fun FileManagerFragment(
     var selectedFile by remember { mutableStateOf<File?>(null) }
     var toggleStates by remember { mutableStateOf<Map<String, Boolean>>(emptyMap()) }
 
-    val viewModel: DirectoryManagerViewModel = viewModel()
+    val viewModel: DirectoryManagerViewModel = hiltViewModel()
     viewModel.init("Files", null)
 
     // Refresh when tab changes
@@ -170,11 +170,11 @@ fun FileManagerFragment(
                         isSelected = selectedFile?.path == file.path,
                         toggleState = toggleStates[file.path] ?: false,
                         onToggle = { isSelected ->
-                            val newState = if (isSelected) toggleStates + (file.path to true) else toggleStates - file.path
+                            val newState = if (isSelected) toggleStates + (file.path to true) else toggleStates + (file.path to false)
                             toggleStates = newState
                         },
                         onSelect = {
-                            selectedFile = if (selectedFile?.path == file.path) null : file
+                            selectedFile = if (selectedFile?.path == file.path) null else file
                         },
                         onDelete = {
                             showDeleteConfirm = true
@@ -200,7 +200,7 @@ fun FileManagerFragment(
                             viewModel.deleteSelected()
                             showDeleteConfirm = false
                             selectedFile = null
-                            toggleStates = toggleStates - selectedFile?.path ?: toggleStates.keySet().toMutableMap()::toMutableMap()
+                            toggleStates = toggleStates + (selectedFile?.path ?: "" to false)
                         },
                         colors = ButtonDefaults.buttonColors(
                             containerColor = MaterialTheme.colorScheme.error,
